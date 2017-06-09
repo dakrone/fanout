@@ -7,6 +7,7 @@ module Server ( Server
 
 import Operation as Op
 import Control.Monad
+import Control.Concurrent (myThreadId)
 import Control.Concurrent.MVar
 import Control.Concurrent.STM (STM(..), atomically)
 import Control.Concurrent.STM.TChan
@@ -39,7 +40,8 @@ newLatch = newMVar True
 readAndExecute :: TChan (Op.Operation Int) -> Latch -> IO ()
 readAndExecute chan latch = do
   op <- atomically $ readTChan chan
-  putStrLn $ "got: " ++ show (Op.execute op)
+  tId <- myThreadId
+  putStrLn $ (show tId) ++ " - got: " ++ show (Op.execute op)
   continue <- readMVar latch
   case continue of
     True -> readAndExecute chan latch
