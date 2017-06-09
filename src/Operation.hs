@@ -3,24 +3,15 @@ module Operation ( Operation
                  , getId
                  , execute) where
 
-class Runnable a where
-  run :: a -> Int -> ()
-
-data Noop = Noop deriving (Eq, Ord, Show)
-
-instance Runnable Noop where
-  run _ _ = ()
-
-data Operation =
+data Operation a =
   Operation { _id       :: Int
-            , _runnable :: Noop }
-               deriving (Eq, Ord, Show)
+            , _runnable :: Int -> a }
 
-empty :: Int -> Operation
-empty i = Operation { _id = i, _runnable = Noop }
+empty :: Int -> Operation Int
+empty i = Operation { _id = i, _runnable = id }
 
-getId :: Operation -> Int
+getId :: Operation a -> Int
 getId = _id
 
-execute :: Operation -> ()
-execute Operation { _runnable = f, _id = i } = run f i
+execute :: Operation a -> a
+execute Operation { _runnable = f, _id = i } = f i
